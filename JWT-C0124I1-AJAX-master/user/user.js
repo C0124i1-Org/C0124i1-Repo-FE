@@ -120,7 +120,7 @@ function saveUserChanges(){
             "Content-Type": "application/json"
         },
         method: "GET",
-        url: "http://localhost:8080/api/user", // URL kiểm tra danh sách người dùng hiện tại
+        url: "http://localhost:8080/api/user",
         success: function(data) {
             let userExists = data.some(user => user.username === username && user.id !== currentEditUserId);
             if (userExists) {
@@ -161,6 +161,7 @@ function deleteUser(id, username){
             url: `http://localhost:8080/api/user/${id}`,
             success: function(){
                 showAllUser();
+                alert("Xoá người dùng thành công!")
             }
         });
     }
