@@ -41,32 +41,53 @@ function showAllUser(){
     });
 }
 
-function addUser(){
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
+function addUser() {
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value.trim();
 
-    let roles = [{id: 1, name: "ADMIN"}];
+    if (username === "" || password === "") {
+        alert("Tên đăng nhập và mật khẩu không được để trống");
+        return;
+    }
 
     $.ajax({
         headers: {
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json"
         },
-        method: "POST",
-        url: "http://localhost:8080/api/user/create",
-        data: JSON.stringify({username: username, password: password, roles: roles}),
-        success: function(){
-            showAllUser();
-            document.getElementById("userForm").reset();
+        method: "GET",
+        url: "http://localhost:8080/api/user",
+        success: function(data) {
+            let userExists = data.some(user => user.username === username);
+            if (userExists) {
+                alert("Tên đăng nhập đã tồn tại");
+            } else {
+                let roles = [{ id: 1, name: "ADMIN" }];
+                $.ajax({
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "Content-Type": "application/json"
+                    },
+                    method: "POST",
+                    url: "http://localhost:8080/api/user/create",
+                    data: JSON.stringify({ username: username, password: password, roles: roles }),
+                    success: function() {
+                        showAllUser();
+                        document.getElementById("userForm").reset();
+                        alert("Thêm người dùng thành công");
+                    }
+                });
+            }
         }
     });
 }
 
 function editUser(id, username, password){
     currentEditUserId = id;
+    originalUsername = username;
+    originalPassword = password;
     document.getElementById("editUsername").value = username;
     document.getElementById("editPassword").value = password;
-
 
     var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'), {
         keyboard: false
@@ -80,20 +101,52 @@ function closeModal(){
 }
 
 function saveUserChanges(){
-    let username = document.getElementById("editUsername").value;
-    let password = document.getElementById("editPassword").value;
+    let username = document.getElementById("editUsername").value.trim();
+    let password = document.getElementById("editPassword").value.trim();
+
+    if (username === "" || password === "") {
+        alert("Tên đăng nhập và mật khẩu không được để trống");
+        return;
+    }
+
+    if (username === originalUsername && password === originalPassword) {
+        alert("Tên đăng nhập và mật khẩu mới không được trùng với tên đăng nhập và mật khẩu cũ");
+        return;
+    }
 
     $.ajax({
         headers: {
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json"
         },
-        method: "PUT",
-        url: `http://localhost:8080/api/user/${currentEditUserId}`,
-        data: JSON.stringify({username: username, password: password}),
-        success: function(){
-            showAllUser();
-            closeModal();
+        method: "GET",
+        url: "http://localhost:8080/api/user",
+        success: function(data) {
+            let userExists = data.some(user => user.username === username && user.id !== currentEditUserId);
+            if (userExists) {
+                alert("Tên đăng nhập đã tồn tại");
+            } else {
+                $.ajax({
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "Content-Type": "application/json"
+                    },
+                    method: "PUT",
+                    url: `http://localhost:8080/api/user/${currentEditUserId}`,
+                    data: JSON.stringify({ username: username, password: password }),
+                    success: function() {
+                        showAllUser();
+                        closeModal();
+                        alert("Cập nhật người dùng thành công");
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Đã xảy ra lỗi khi cập nhật người dùng: " + error);
+                    }
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            alert("Đã xảy ra lỗi khi kiểm tra tên đăng nhập: " + error);
         }
     });
 }
@@ -108,6 +161,7 @@ function deleteUser(id, username){
             url: `http://localhost:8080/api/user/${id}`,
             success: function(){
                 showAllUser();
+                alert("Xoá người dùng thành công!")
             }
         });
     }
