@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Revenue</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<h2>Revenue Manager</h2>
+<h3>Total Revenue</h3>
+<button onclick="totalRevenue()">show</button>
+<p id="totalRevenue"></p>
+<h3>Daily Revenue</h3>
+<label for="start">Start Time:</label>
+<input type="text" id="start" placeholder="dd/MM/yyyy HH:mm:ss">
+<label for="end">End Time:</label>
+<input type="text" id="end" placeholder="dd/MM/yyyy HH:mm:ss">
+<button onclick="dailyRevenue()">show</button>
+<p id="dailyRevenue"></p>
+<script src="revenue.js"></script>
+</body>
+</html>
