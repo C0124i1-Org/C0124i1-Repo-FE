@@ -5,25 +5,104 @@
     <title>Customer</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #title {
+            text-align: center;
+        }
+        #div-btn {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        #customerList {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #add-computer, #update-computer, #add-service-form {
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="hidden"], input[type="number"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button[type="submit"], #hide-create, #hide-service {
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #hide-create, #hide-service {
+            background-color: #f44336;
+        }
+        #hide-create:hover, button[type="submit"]:hover, #hide-service:hover {
+            opacity: 0.9;
+        }
+        #update-computer {
+            display: none;
+        }
+
+        #show-list-button {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <h1 id="title">List Customer</h1>
 <div id="div-btn">
     <button onclick="showAllCustomer()" id="display">Show List Computer</button>
-<!--    <button onclick="displayFormCreate()" id="display-create">Add New Customer</button>-->
+    <button onclick="displayFormCreate()" id="display-create">Add New Computer</button>
+    <button onclick="hideUpdateForm()" id="show-list-button" style="display: none;">Show List Computer</button>
+    <button onclick="displayServiceForm()" id="display-service-form">Add New Service</button>
+    <button onclick="showOnlineComputers()" id="show-online-button">Show Online Computers</button>
+    <button onclick="showOfflineComputers()" id="show-offline-button">Show Offline Computers</button>
 </div>
-<div id="customerList"></div>
-
+<div id="computerList"></div>
+<!-- Phần giao diện để chọn dịch vụ -->
+<div id="serviceList" style="display:none;">
+    <h2>Chọn dịch vụ</h2>
+    <table id="serviceTable">
+        <!-- Danh sách dịch vụ sẽ được tải vào đây -->
+    </table>
+    <button onclick="addServiceToComputer()">Thêm dịch vụ</button>
+</div>
 <div id="add-computer">
     <h2>Create Computer</h2>
     <form id="create-form" onsubmit="createComputer(); return false;">
         <label for="create-name">Name:</label>
         <input type="text" id="create-name" required><br>
         <button type="submit">Create Computer</button>
+        <button type="button" onclick="hideFormCreate()" id="hide-create">Cancel</button>
     </form>
 </div>
 
-<div id="update-computer" style="display: none;">
+<div id="update-computer">
     <h2>Update Computer</h2>
     <form id="update-form">
         <input type="hidden" id="update-id">
@@ -33,6 +112,39 @@
     </form>
 </div>
 
+<div id="add-service-form">
+    <h2>Add New Service</h2>
+    <form id="service-form" onsubmit="createService(); return false;">
+        <label for="service-name">Service Name:</label>
+        <input type="text" id="service-name" required><br>
+        <label for="service-cost">Service Cost (VND):</label>
+        <input type="number" id="service-cost" required><br>
+        <button type="submit">Add Service</button>
+        <button type="button" onclick="hideServiceForm()" id="hide-service">Cancel</button>
+    </form>
+</div>
+
 <script src="computer.js"></script>
+<script>
+    function displayFormCreate() {
+        document.getElementById('add-computer').style.display = 'block';
+        document.getElementById('display-create').style.display = 'none';
+    }
+
+    function hideFormCreate() {
+        document.getElementById('add-computer').style.display = 'none';
+        document.getElementById('display-create').style.display = 'inline-block';
+    }
+
+    function displayServiceForm() {
+        document.getElementById('add-service-form').style.display = 'block';
+        document.getElementById('display-service-form').style.display = 'none';
+    }
+
+    function hideServiceForm() {
+        document.getElementById('add-service-form').style.display = 'none';
+        document.getElementById('display-service-form').style.display = 'inline-block';
+    }
+</script>
 </body>
 </html>
