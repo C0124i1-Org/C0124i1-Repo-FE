@@ -19,7 +19,7 @@ function totalRevenue() {
         method: "GET",
         url: "http://localhost:8080/api/revenue",
         success: function (data) {
-            $('#totalRevenue').text("Revenue to date: " + new Date().toLocaleDateString() + ": " + data);
+            $('#totalRevenue').text("Revenue to date " + new Date().toLocaleDateString() + ": " + data);
         }
         });
 }
@@ -47,28 +47,33 @@ function dailyRevenue() {
             if (dulieu != null && dulieu.length > 0) {
                 let totalRevenue = 0;
                 let content = `
-                    <table>
-                    <tr>
-                    <th>Name Computer</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Revenue</th>
-                    </tr>
-                `;
+                        <table id="dailyRevenueTable">
+                            <tr>
+                                <th>Name Computer</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Revenue</th>
+                            </tr>
+                        `;
                 dulieu.forEach(item => {
                     content += `
-                    <tr>
-                    <td>${item.computer.name}</td>
-                    <td>${item.startTime}</td>
-                    <td>${item.endTime}</td>
-                    <td>${item.totalRevenue}</td>
-                    </tr>
-                    `;
+                            <tr>
+                                <td>${item.computer.name}</td>
+                                <td>${item.startTime}</td>
+                                <td>${item.endTime}</td>
+                                <td>${item.totalRevenue}</td>
+                            </tr>
+                            `;
                     totalRevenue += item.totalRevenue;
                 });
 
-                content += `</table>
-                            <p>Total Revenue: ${totalRevenue}</p>`;
+                content += `
+                            <tr>
+                                <td colspan="3" style="text-align: right;"><strong>Total Revenue:</strong></td>
+                                <td>${totalRevenue}</td>
+                            </tr>
+                        </table>
+                    `;
                 document.getElementById("dailyRevenue").innerHTML = content;
             } else {
                 document.getElementById("dailyRevenue").innerHTML = "<p>No data available for the selected time range.</p>";
