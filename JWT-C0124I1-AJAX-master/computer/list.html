@@ -72,9 +72,12 @@
             display: none;
         }
     </style>
+
+    <script src="../login/login.js"></script>
+
 </head>
 <body>
-<h1 id="title">List Customer</h1>
+<h1 id="title">Internet Shop Manager</h1>
 <div id="div-btn">
     <button onclick="showAllCustomer()" id="display">Show List Computer</button>
     <button onclick="displayFormCreate()" id="display-create">Add New Computer</button>
@@ -82,6 +85,10 @@
     <button onclick="displayServiceForm()" id="display-service-form">Add New Service</button>
     <button onclick="showOnlineComputers()" id="show-online-button">Show Online Computers</button>
     <button onclick="showOfflineComputers()" id="show-offline-button">Show Offline Computers</button>
+
+    <button onclick="goToPageUser()" id="goToPageUser">User Manager</button>
+    <button onclick="goToPageRevenue()" id="goToPageRevenue">Revenue</button>
+
 </div>
 <div id="computerList"></div>
 <!-- Phần giao diện để chọn dịch vụ -->
@@ -125,6 +132,10 @@
 </div>
 
 <script src="computer.js"></script>
+
+<script src="/Volumes/DATA/C0124i1-Repo-FE/JWT-C0124I1-AJAX-master/login/login.js"></script>
+
+
 <script>
     function displayFormCreate() {
         document.getElementById('add-computer').style.display = 'block';

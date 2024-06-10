@@ -274,13 +274,17 @@ $('#service-form').submit(function(e) {
 });
 document.getElementById("update-form").addEventListener("submit", updateCustomer);
 
+
+
 function showOnlineComputers() {
     $.ajax({
         headers: {
             "Authorization": "Bearer " + token
         },
         method: "GET",
+
         url: "http://localhost:8080/api/computer/online",
+
         success: function (data) {
             if (data != null && data.length > 0) {
                 let content = `
@@ -290,7 +294,9 @@ function showOnlineComputers() {
                         <th>Name</th>
                         <th>Status</th>
                         <th>Actions</th>
+
                         <th>Check-out</th>
+
                     </tr>`;
                 for (let i = 0; i < data.length; i++) {
                     content += `
@@ -303,9 +309,11 @@ function showOnlineComputers() {
                             <a href="#" onclick="fetchCustomerForUpdate(${data[i].id})">Update</a> |
                             <a href="#" onclick="deleteSmartphone(${data[i].id})">Delete</a>
                         </td>
+
                         <td>
                             <button onclick="stopComputer(${data[i].id})">Tắt máy và Tính tiền</button>
                         </td>
+
                     </tr>`;
                 }
                 content += "</table>";
@@ -315,6 +323,7 @@ function showOnlineComputers() {
                 document.getElementById('update-computer').style.display = "none";
                 document.getElementById('title').style.display = "block";
             } else {
+
                 document.getElementById('computerList').innerHTML = "All Computer Offline";
             }
         },
@@ -398,13 +407,16 @@ function addServiceToComputer(computerId) {
         }
     });
 }
+
 function showOfflineComputers() {
     $.ajax({
         headers: {
             "Authorization": "Bearer " + token
         },
         method: "GET",
+
         url: "http://localhost:8080/api/computer/offline",
+
         success: function (data) {
             if (data != null && data.length > 0) {
                 let content = `
@@ -414,7 +426,9 @@ function showOfflineComputers() {
                         <th>Name</th>
                         <th>Status</th>
                         <th>Actions</th>
+
                         <th>Check-in</th>
+
                     </tr>`;
                 for (let i = 0; i < data.length; i++) {
                     content += `
@@ -427,9 +441,11 @@ function showOfflineComputers() {
                             <a href="#" onclick="fetchCustomerForUpdate(${data[i].id})">Update</a> |
                             <a href="#" onclick="deleteSmartphone(${data[i].id})">Delete</a>
                         </td>
+
                         <td>
                             <button onclick="startComputer(${data[i].id})">Bật máy</button>
                         </td>
+
                     </tr>`;
                 }
                 content += "</table>";
@@ -439,6 +455,7 @@ function showOfflineComputers() {
                 document.getElementById('update-computer').style.display = "none";
                 document.getElementById('title').style.display = "block";
             } else {
+
                 document.getElementById('computerList').innerHTML = "All Computer Online ";
             }
         },
@@ -483,6 +500,7 @@ function startComputer(id) {
         }
     });
 }
+
 
 
 

@@ -25,3 +25,9 @@ function login(){
         }
     })
 }
+function goToPageUser(){
+    window.location.href = "../user/user.html"
+}
+function goToPageRevenue(){
+    window.location.href = "../revenue/revenue.html"
+}
