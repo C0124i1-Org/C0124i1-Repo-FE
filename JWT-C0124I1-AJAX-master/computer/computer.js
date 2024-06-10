@@ -273,13 +273,18 @@ $('#service-form').submit(function(e) {
     });
 });
 document.getElementById("update-form").addEventListener("submit", updateCustomer);
+
+
+
 function showOnlineComputers() {
     $.ajax({
         headers: {
             "Authorization": "Bearer " + token
         },
         method: "GET",
-        url: "http://localhost:8080/api/computer/online", // Điều chỉnh URL API của bạn nếu cần thiết
+
+        url: "http://localhost:8080/api/computer/online",
+
         success: function (data) {
             if (data != null && data.length > 0) {
                 let content = `
@@ -289,6 +294,9 @@ function showOnlineComputers() {
                         <th>Name</th>
                         <th>Status</th>
                         <th>Actions</th>
+
+                        <th>Check-out</th>
+
                     </tr>`;
                 for (let i = 0; i < data.length; i++) {
                     content += `
@@ -301,6 +309,11 @@ function showOnlineComputers() {
                             <a href="#" onclick="fetchCustomerForUpdate(${data[i].id})">Update</a> |
                             <a href="#" onclick="deleteSmartphone(${data[i].id})">Delete</a>
                         </td>
+
+                        <td>
+                            <button onclick="stopComputer(${data[i].id})">Tắt máy và Tính tiền</button>
+                        </td>
+
                     </tr>`;
                 }
                 content += "</table>";
@@ -310,119 +323,90 @@ function showOnlineComputers() {
                 document.getElementById('update-computer').style.display = "none";
                 document.getElementById('title').style.display = "block";
             } else {
-                document.getElementById('computerList').innerHTML = "No data available";
+
+                document.getElementById('computerList').innerHTML = "All Computer Offline";
             }
+        },
+        error: function (xhr, status, error) {
+            alert("Error fetching online computers: " + error);
         }
     });
 }
-// function showOnlineComputers() {
-//     $.ajax({
-//         headers: {
-//             "Authorization": "Bearer " + token
-//         },
-//         method: "GET",
-//         url: "http://localhost:8080/api/computer/online",
-//         success: function (data) {
-//             if (data && data.length > 0) {
-//                 let content = `
-//                 <h2>Chọn máy online</h2>
-//                 <table border="1">
-//                     <tr>
-//                         <th>Id</th>
-//                         <th>Name</th>
-//                         <th>Chọn</th>
-//                     </tr>`;
-//                 for (let i = 0; i < data.length; i++) {
-//                     content += `
-//                     <tr>
-//                         <td>${data[i].id}</td>
-//                         <td>${data[i].name}</td>
-//                         <td><input type="radio" name="computer" value="${data[i].id}" onclick="selectComputer(${data[i].id})"></td>
-//                     </tr>`;
-//                 }
-//                 content += "</table>";
-//                 $('#computerList').html(content);
-//                 $('#serviceList').hide();
-//             } else {
-//                 $('#computerList').html("No data available");
-//             }
-//         }
-//     });
-// }
-//
-// // Chọn máy
-// function selectComputer(id) {
-//     selectedComputerId = id;
-//     showServiceList();
-// }
-//
-// // Hiển thị danh sách dịch vụ
-// function showServiceList() {
-//     $.ajax({
-//         headers: {
-//             "Authorization": "Bearer " + token
-//         },
-//         method: "GET",
-//         url: "http://localhost:8080/api/service",
-//         success: function (data) {
-//             if (data && data.length > 0) {
-//                 let content = `
-//                 <tr>
-//                     <th>Id</th>
-//                     <th>Name</th>
-//                     <th>Cost</th>
-//                     <th>Chọn</th>
-//                 </tr>`;
-//                 for (let i = 0; i < data.length; i++) {
-//                     content += `
-//                     <tr>
-//                         <td>${data[i].id}</td>
-//                         <td>${data[i].name}</td>
-//                         <td>${data[i].cost}</td>
-//                         <td><input type="radio" name="service" value="${data[i].id}" onclick="selectService(${data[i].id})"></td>
-//                     </tr>`;
-//                 }
-//                 $('#serviceTable').html(content);
-//                 $('#serviceList').show();
-//             } else {
-//                 $('#serviceTable').html("No services available");
-//             }
-//         }
-//     });
-// }
-//
-// // Chọn dịch vụ
-// function selectService(id) {
-//     selectedServiceId = id;
-// }
-//
-// // Thêm dịch vụ vào máy đã chọn
-// function addServiceToComputer() {
-//     if (selectedComputerId && selectedServiceId) {
-//         $.ajax({
-//             headers: {
-//                 "Authorization": "Bearer " + token,
-//                 'Content-Type': 'application/json'
-//             },
-//             method: "POST",
-//             url: `http://localhost:8080/api/computer/${selectedComputerId}/services`,
-//             data: JSON.stringify({ serviceId: selectedServiceId }),
-//             success: function () {
-//                 alert("Dịch vụ đã được thêm vào máy thành công!");
-//             },
-//             error: function (xhr, status, error) {
-//                 alert("Có lỗi xảy ra: " + error);
-//             }
-//         });
-//     } else {
-//         alert("Vui lòng chọn máy và dịch vụ.");
-//     }
-// }
-//
-// // Hiển thị danh sách các máy đang bật khi trang được tải
-// $(document).ready(function() {
-//     showOnlineComputers();
-// });
+function addServiceToComputer(computerId) {
+    // Hiển thị danh sách dịch vụ có sẵn và cho người dùng chọn
+    $.ajax({
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        method: "GET",
+        url: "http://localhost:8080/api/service", // Điều chỉnh URL API để lấy danh sách dịch vụ
+        success: function (services) {
+            if (services != null && services.length > 0) {
+                let content = "<h2>Choose Service</h2>";
+                content += "<ul>";
+                for (let i = 0; i < services.length; i++) {
+                    content += `<li><input type="checkbox" name="services" value="${services[i].id}" id="service_${services[i].id}">`;
+                    content += `<label for="service_${services[i].id}">${services[i].name} - ${services[i].cost} VND</label></li>`;
+                }
+                content += "</ul>";
+
+                // Hiển thị danh sách dịch vụ
+                document.getElementById('serviceList').innerHTML = content;
+                document.getElementById('serviceList').style.display = 'block';
+
+                // Thêm nút "Confirm" để người dùng xác nhận thêm dịch vụ
+                let confirmButton = document.createElement('button');
+                confirmButton.textContent = "Confirm";
+                confirmButton.onclick = function() {
+                    // Lấy danh sách các dịch vụ đã được chọn
+                    let selectedServices = [];
+                    let checkboxes = document.getElementsByName('services');
+                    for (let i = 0; i < checkboxes.length; i++) {
+                        if (checkboxes[i].checked) {
+                            selectedServices.push(parseInt(checkboxes[i].value));
+                        }
+                    }
+
+                    // Gửi yêu cầu thêm dịch vụ vào máy
+                    $.ajax({
+                        headers: {
+                            "Authorization": "Bearer " + token,
+                            'Content-Type': 'application/json'
+                        },
+                        method: "POST",
+                        url: `http://localhost:8080/api/computer/${computerId}/services`,
+                        data: JSON.stringify({ services: selectedServices }),
+                        success: function () {
+                            alert("Services added successfully!");
+                            // Sau khi thêm dịch vụ thành công, ẩn danh sách dịch vụ và cập nhật lại danh sách máy
+                            document.getElementById('serviceList').style.display = 'none';
+                            showOnlineComputers();
+                        },
+                        error: function (xhr, status, error) {
+                            alert("Error adding services: " + error);
+                        }
+                    });
+                };
+
+                // Thêm nút "Cancel" để hủy thao tác thêm dịch vụ
+                let cancelButton = document.createElement('button');
+                cancelButton.textContent = "Cancel";
+                cancelButton.onclick = function() {
+                    document.getElementById('serviceList').style.display = 'none';
+                };
+
+                // Thêm nút "Confirm" và "Cancel" vào giao diện
+                document.getElementById('serviceList').appendChild(confirmButton);
+                document.getElementById('serviceList').appendChild(cancelButton);
+            } else {
+                alert("No services available.");
+            }
+        },
+        error: function (xhr, status, error) {
+            alert("Error fetching services: " + error);
+        }
+    });
+}
 
 function showOfflineComputers() {
     $.ajax({
@@ -430,7 +414,9 @@ function showOfflineComputers() {
             "Authorization": "Bearer " + token
         },
         method: "GET",
-        url: "http://localhost:8080/api/computer/offline", // Điều chỉnh URL API của bạn nếu cần thiết
+
+        url: "http://localhost:8080/api/computer/offline",
+
         success: function (data) {
             if (data != null && data.length > 0) {
                 let content = `
@@ -440,6 +426,9 @@ function showOfflineComputers() {
                         <th>Name</th>
                         <th>Status</th>
                         <th>Actions</th>
+
+                        <th>Check-in</th>
+
                     </tr>`;
                 for (let i = 0; i < data.length; i++) {
                     content += `
@@ -452,6 +441,11 @@ function showOfflineComputers() {
                             <a href="#" onclick="fetchCustomerForUpdate(${data[i].id})">Update</a> |
                             <a href="#" onclick="deleteSmartphone(${data[i].id})">Delete</a>
                         </td>
+
+                        <td>
+                            <button onclick="startComputer(${data[i].id})">Bật máy</button>
+                        </td>
+
                     </tr>`;
                 }
                 content += "</table>";
@@ -461,9 +455,52 @@ function showOfflineComputers() {
                 document.getElementById('update-computer').style.display = "none";
                 document.getElementById('title').style.display = "block";
             } else {
-                document.getElementById('computerList').innerHTML = "No data available";
+
+                document.getElementById('computerList').innerHTML = "All Computer Online ";
             }
+        },
+        error: function (xhr, status, error) {
+            alert("Error fetching offline computers: " + error);
         }
     });
 }
+
+function stopComputer(id) {
+    $.ajax({
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        method: "POST",
+        url: `http://localhost:8080/api/computer/${id}/stop`,
+        success: function (data) {
+            let usageTime = data.usageTime;
+            let serviceCost = data.serviceCost;
+            let totalCost = data.totalCost;
+            alert(`Usage Time: ${usageTime} hours\nService Cost: ${serviceCost} VND\nTotal Cost: ${totalCost} VND`);
+            showOnlineComputers(); // Refresh the list of online computers
+        },
+        error: function (xhr, status, error) {
+            alert("Error stopping computer: " + error);
+        }
+    });
+}
+function startComputer(id) {
+    $.ajax({
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        method: "POST",
+        url: `http://localhost:8080/api/computer/${id}/start`,
+        success: function (data) {
+            alert(data);
+            showOfflineComputers(); // Refresh the list of offline computers
+        },
+        error: function (xhr, status, error) {
+            alert("Error starting computer: " + error);
+        }
+    });
+}
+
+
+
 
